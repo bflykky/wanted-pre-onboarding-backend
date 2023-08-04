@@ -23,15 +23,19 @@ public class Post {
     @Column(name = "post_id")
     private Long postId;
 
+    @NotNull
+    @Column(name = "writer_name")
+    private String writerName;
+
+    @NotNull
+    @Column(name = "write_date")
+    private LocalDateTime writeDate;
+
     @NotBlank
     private String title;
 
     @NotBlank
     private String content;
-
-    @NotNull
-    @Column(name = "write_date")
-    private LocalDateTime writeDate;
 
     @ManyToOne @NotNull
     @JoinColumn(name = "member_id")

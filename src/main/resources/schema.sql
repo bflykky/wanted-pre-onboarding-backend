@@ -14,16 +14,16 @@ drop table if exists post;
 create table member (
     member_id bigint not null auto_increment,
     email varchar(255) not null,
-    name varchar(255) not null,
     password varchar(255) not null,
     primary key (member_id)
 ) engine=InnoDB;
 
 create table post (
     post_id bigint not null auto_increment,
-    content varchar(255),
-    title TEXT,
+    writer varchar(255) not null,
     write_date datetime(6) not null,
+    title varchar(255),
+    content TEXT,
     member_id bigint not null,
     primary key (post_id)
 ) engine=InnoDB;

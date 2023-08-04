@@ -23,9 +23,6 @@ public class Member {
     private Long id;
 
     @NotBlank
-    private String name;
-
-    @NotBlank
     private String email;
 
     @NotBlank
@@ -33,4 +30,9 @@ public class Member {
 
     @OneToMany(mappedBy = "member")
     private List<Post> posts = new ArrayList<>();
+
+    public Member(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 }
