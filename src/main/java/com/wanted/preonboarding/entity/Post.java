@@ -21,11 +21,11 @@ public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "post_id")
-    private Long postId;
+    private Long id;
 
     @NotNull
-    @Column(name = "writer_name")
-    private String writerName;
+    @Column(name = "writer")
+    private String writer;
 
     @NotNull
     @Column(name = "write_date")
@@ -40,4 +40,18 @@ public class Post {
     @ManyToOne @NotNull
     @JoinColumn(name = "member_id")
     private Member member;
+
+    public Post(String title, String content) {
+        this.writer = "익명";
+        this.writeDate = LocalDateTime.now();
+        this.title = title;
+        this.content = content;
+    }
+
+    public void modifyTitle(String title) {
+        this.title = title;
+    }
+    public void modifyContent(String content) {
+        this.content = content;
+    }
 }
