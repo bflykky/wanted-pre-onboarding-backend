@@ -5,15 +5,18 @@ import com.wanted.preonboarding.dto.post.PostCreateRequestDto;
 import com.wanted.preonboarding.dto.post.PostFindResponseDto;
 import com.wanted.preonboarding.dto.post.PostModifyRequestDto;
 import com.wanted.preonboarding.dto.post.PostModifyResponseDto;
+import com.wanted.preonboarding.entity.Member;
 import com.wanted.preonboarding.entity.Post;
 import com.wanted.preonboarding.error.ErrorCode;
 import com.wanted.preonboarding.error.exception.EntityNotFoundException;
+import com.wanted.preonboarding.repository.MemberRepository;
 import com.wanted.preonboarding.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +24,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PostService {
     private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
 
-    public PostCreateResponseDto createPost(PostCreateRequestDto postCreateRequestDto) {
-        Post post = new Post(postCreateRequestDto.getTitle(), postCreateRequestDto.getContent());
+    public PostCreateResponseDto createPost(PostCreateRequestDto postCreateRequestDto, String email) {
+        Member member = memberRepository.findByEmail(email).orElse(null);
+        String title = postCreateRequestDto.getTitle();
+        String content = postCreateRequestDto.getContent();
+
+        Post post = new Post(member, LocalDateTime.now(), title, content);
         Long postId = postRepository.save(post).getId();
         return PostCreateResponseDto.of(postId);
     }
@@ -42,6 +50,7 @@ public class PostService {
 
         return responseDtoList;
     }
+
     public List<PostFindResponseDto> findAllPosts(Pageable pageable) {
         List<Post> posts = postRepository.findAll(pageable).toList();
         List<PostFindResponseDto> responseDtoList = new ArrayList<>();

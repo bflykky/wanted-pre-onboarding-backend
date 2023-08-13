@@ -41,11 +41,12 @@ public class Post {
     @JoinColumn(name = "member_id")
     private Member member;
 
-    public Post(String title, String content) {
-        this.writer = "익명";
-        this.writeDate = LocalDateTime.now();
+    public Post(Member member, LocalDateTime writeDate, String title, String content) {
+        this.writer = member.getEmail();
+        this.writeDate = writeDate;
         this.title = title;
         this.content = content;
+        this.member = member;
     }
 
     public void modifyTitle(String title) {
