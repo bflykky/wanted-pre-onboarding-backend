@@ -31,10 +31,7 @@ public class WriterAuthorizationProvider implements AuthenticationProvider {
                 .orElseThrow(() -> new EntityNotFoundException(ErrorCode.POST_NOT_FOUND));
         if (!email.equals(post.getWriter())) {
             // 수정 또는 삭제를 요청한 클라이언트가 해당 게시글 작성자가 아닌 경우
-            System.out.println("요청자 email: " + email);
-            System.out.println("post.getWriter(): " + post.getWriter());
-            System.out.println("해당 게시글의 작성자가 아닙니다.");
-            throw new BadCredentialsException("해당 게시글의 작성자가 아닙니다.(BadCredential)");
+            throw new BadCredentialsException("해당 게시글의 작성자가 아닙니다.");
         }
 
         JwtAuthenticationToken authenticationToken =

@@ -71,6 +71,7 @@ public class JwtAuthorizationFilter extends AbstractAuthenticationProcessingFilt
             objectMapper.writeValue(os, ResultResponse.of(ResultCode.MEMBER_LOGIN_SUCCESS, MemberLoginResponseDto.of(jwt)));
             os.flush();
         }
-        super.successfulAuthentication(request, response, chain, authResult);
+
+         super.successfulAuthentication(request, response, chain, authResult);
     }
 }

@@ -2,6 +2,8 @@ package com.wanted.preonboarding.config;
 
 import com.wanted.preonboarding.jwt.filter.CustomBearerTokenAuthenticationFilter;
 import com.wanted.preonboarding.jwt.filter.WriterAuthorizationFilter;
+import com.wanted.preonboarding.jwt.handler.AHandler;
+import com.wanted.preonboarding.jwt.handler.BHandler;
 import com.wanted.preonboarding.jwt.handler.JwtAccessDeniedHandler;
 import com.wanted.preonboarding.jwt.handler.JwtAuthenticationEntryPoint;
 import com.wanted.preonboarding.jwt.filter.JwtAuthorizationFilter;
@@ -41,9 +43,21 @@ public class SecurityConfig {
     private final Validator validator;
 
     @Bean
+    public AHandler aHandler() {
+        return new AHandler();
+    }
+
+    @Bean
+    public BHandler bHandler() {
+        return new BHandler();
+    }
+
+    @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter(AuthenticationManager authenticationManager) throws Exception {
         final JwtAuthorizationFilter filter = new JwtAuthorizationFilter(validator, jwtProvider);
         filter.setAuthenticationManager(authenticationManager);
+//        filter.setAuthenticationSuccessHandler(aHandler());
+//        filter.setAuthenticationFailureHandler(bHandler());
 
         return filter;
     }
@@ -52,6 +66,8 @@ public class SecurityConfig {
     public CustomBearerTokenAuthenticationFilter customBearerTokenAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
         final CustomBearerTokenAuthenticationFilter filter = new CustomBearerTokenAuthenticationFilter(jwtProvider);
         filter.setAuthenticationManager(authenticationManager);
+        filter.setAuthenticationSuccessHandler(aHandler());
+        filter.setAuthenticationFailureHandler(bHandler());
 
         return filter;
     }
@@ -60,6 +76,8 @@ public class SecurityConfig {
     public WriterAuthorizationFilter writerAuthorizationFilter(AuthenticationManager authenticationManager) throws Exception {
         final WriterAuthorizationFilter filter = new WriterAuthorizationFilter(validator, jwtProvider);
         filter.setAuthenticationManager(authenticationManager);
+        filter.setAuthenticationSuccessHandler(aHandler());
+        filter.setAuthenticationFailureHandler(bHandler());
 
         return filter;
     }
@@ -80,15 +98,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
-//                .csrf(csrf -> csrf.disable()) // token을 사용하는 방식이므로, csrf disable
-                .csrf().disable()
-
-                .formLogin()
-                    .loginPage("/members/login")
-                    .loginProcessingUrl("/members/login")
-                    .permitAll()
-                    .and()
-                    .csrf().disable()
+                .csrf(csrf -> csrf.disable()) // token을 사용하는 방식이므로, csrf disable
 
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .accessDeniedHandler(jwtAccessDeniedHandler)

@@ -8,7 +8,6 @@ import com.wanted.preonboarding.error.ErrorResponse;
 import com.wanted.preonboarding.jwt.provider.JwtProvider;
 import com.wanted.preonboarding.jwt.token.CustomBearerTokenAuthenticationToken;
 import org.springframework.http.MediaType;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -27,9 +26,7 @@ import java.io.OutputStream;
  */
 public class CustomBearerTokenAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private static final OrRequestMatcher REQUEST_MATCHER = new OrRequestMatcher(
-            new AntPathRequestMatcher("/posts", "POST"),
-            new AntPathRequestMatcher("/posts/*", "PATCH"),
-            new AntPathRequestMatcher("/posts/*", "DELETE"));
+            new AntPathRequestMatcher("/posts", "POST"));
 
     private final JwtProvider jwtProvider;
     public CustomBearerTokenAuthenticationFilter(JwtProvider jwtProvider) {
@@ -65,6 +62,6 @@ public class CustomBearerTokenAuthenticationFilter extends AbstractAuthenticatio
             objectMapper.writeValue(os, errorResponse);
             os.flush();
         }
-        super.unsuccessfulAuthentication(request, response, failed);
+        // super.unsuccessfulAuthentication(request, response, failed);
     }
 }

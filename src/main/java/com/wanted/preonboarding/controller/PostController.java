@@ -32,6 +32,7 @@ public class PostController {
     @PostMapping(value = "/posts")
     public ResultResponse createPost(@RequestHeader("Authorization") String jwt, @RequestBody PostCreateRequestDto postCreateRequestDto) {
         System.out.println("Authorization: " + jwt);
+        jwt = jwt.substring("Bearer ".length());
 
         PostCreateResponseDto postCreateResponseDto = postService.createPost(postCreateRequestDto, jwtProvider.getSubject(jwt));
         return ResultResponse.of(ResultCode.POST_CREATE_SUCCESS, postCreateResponseDto);

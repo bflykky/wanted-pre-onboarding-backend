@@ -3,10 +3,13 @@ package com.wanted.preonboarding.jwt.filter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.wanted.preonboarding.error.ErrorCode;
 import com.wanted.preonboarding.error.ErrorResponse;
+import com.wanted.preonboarding.jwt.exception.BearerTokenNotValidException;
+import com.wanted.preonboarding.jwt.exception.JwtNotFoundException;
 import com.wanted.preonboarding.jwt.provider.JwtProvider;
 import com.wanted.preonboarding.jwt.token.JwtAuthenticationToken;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
@@ -45,26 +48,20 @@ public class WriterAuthorizationFilter extends AbstractAuthenticationProcessingF
         if (!(request.getMethod().equals("PATCH") || request.getMethod().equals("DELETE"))) {
             throw new AuthenticationServiceException("Authentication method not supported: " + request.getMethod());
         } else {
-            try {
-                String jwt = request.getHeader("Authorization");
-                if (jwt == null) {
-                    throw new IOException("jwt가 존재하지 않습니다.");
-                }
-                if (jwt.startsWith("Bearer ") == false) {
-                    throw new IOException("인증 타입이 \'Bearer\'가 아닙니다.");
-                }
-
-                String uri = request.getRequestURI();
-                Long postId = Long.parseLong(uri.split("/")[2]);
-                System.out.println("postId: " + postId);
-
-                Authentication tmpToken = jwtProvider.getAuthentication(jwt.substring("Bearer ".length()));
-
-                final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(tmpToken, postId);
-                return super.getAuthenticationManager().authenticate(authenticationToken);
-            } catch (IOException e) {
-                throw new AuthenticationServiceException("Authentication failed while converting request body.");
+            String jwt = request.getHeader("Authorization");
+            if (jwt == null) {
+                throw new JwtNotFoundException("JWT가 존재하지 않습니다. 로그인을 통해 JWT를 발급받아야 합니다.");
+            } else if (jwt.startsWith("Bearer ") == false) {
+                throw new BearerTokenNotValidException("인증 타입이 \'Bearer\'가 아닙니다.");
             }
+
+            String uri = request.getRequestURI();
+            Long postId = Long.parseLong(uri.split("/")[2]);
+            System.out.println("postId: " + postId);
+            Authentication tmpToken = jwtProvider.getAuthentication(jwt.substring("Bearer ".length()));
+
+            final JwtAuthenticationToken authenticationToken = new JwtAuthenticationToken(tmpToken, postId);
+            return super.getAuthenticationManager().authenticate(authenticationToken);
         }
     }
 
@@ -73,12 +70,15 @@ public class WriterAuthorizationFilter extends AbstractAuthenticationProcessingF
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         try (OutputStream os = response.getOutputStream()) {
             ObjectMapper objectMapper = new ObjectMapper();
-            ErrorResponse errorResponse = ErrorResponse.of(ErrorCode.NO_AUTHORIZED_TO_MODIFY_POST);
+            ErrorResponse errorResponse = null;
+            if (request.getMethod().equals("PATCH")) {
+                errorResponse = ErrorResponse.of(ErrorCode.NO_AUTHORIZED_TO_MODIFY_POST);
+            } else if (request.getMethod().equals("DELETE")) {
+                errorResponse = ErrorResponse.of(ErrorCode.NO_AUTHORIZED_TO_DELETE_POST);
+            }
             response.setStatus(errorResponse.getStatus());
             objectMapper.writeValue(os, errorResponse);
             os.flush();
         }
-
-        super.unsuccessfulAuthentication(request, response, failed);
     }
 }
