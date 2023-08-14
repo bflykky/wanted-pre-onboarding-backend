@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +28,7 @@ public class Post {
     @Column(name = "writer")
     private String writer;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @NotNull
     @Column(name = "write_date")
     private LocalDateTime writeDate;

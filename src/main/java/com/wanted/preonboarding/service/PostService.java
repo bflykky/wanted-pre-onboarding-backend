@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +31,8 @@ public class PostService {
         Member member = memberRepository.findByEmail(email).orElse(null);
         String title = postCreateRequestDto.getTitle();
         String content = postCreateRequestDto.getContent();
+
+
 
         Post post = new Post(member, LocalDateTime.now(), title, content);
         Long postId = postRepository.save(post).getId();

@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.dto.post;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.wanted.preonboarding.entity.Post;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
 public class PostFindResponseDto {
     private Long postId;
     private String writer;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime writeDate;
 
     private String title;
