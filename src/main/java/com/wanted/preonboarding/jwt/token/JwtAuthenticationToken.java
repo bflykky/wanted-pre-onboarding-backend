@@ -23,10 +23,6 @@ public class JwtAuthenticationToken extends UsernamePasswordAuthenticationToken 
         this.postId = postId;
     }
 
-//    public static JwtAuthenticationToken of(String token, String jwt){
-//        return new JwtAuthenticationToken(token, jwt);
-//    }
-
     public Long getPostId() {
         return this.postId;
     }

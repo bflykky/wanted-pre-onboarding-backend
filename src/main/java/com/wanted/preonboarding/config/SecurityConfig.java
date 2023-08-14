@@ -1,15 +1,17 @@
 package com.wanted.preonboarding.config;
 
-import com.wanted.preonboarding.jwt.filter.CustomBearerTokenAuthenticationFilter;
+import com.wanted.preonboarding.jwt.filter.JwtAuthenticationFilter;
 import com.wanted.preonboarding.jwt.filter.WriterAuthorizationFilter;
-import com.wanted.preonboarding.jwt.handler.AHandler;
-import com.wanted.preonboarding.jwt.handler.BHandler;
+import com.wanted.preonboarding.jwt.handler.CustomAuthenticationSuccessHandler;
 import com.wanted.preonboarding.jwt.handler.JwtAccessDeniedHandler;
 import com.wanted.preonboarding.jwt.handler.JwtAuthenticationEntryPoint;
-import com.wanted.preonboarding.jwt.filter.JwtAuthorizationFilter;
-import com.wanted.preonboarding.jwt.provider.CustomBearerTokenAuthenticationProvider;
+import com.wanted.preonboarding.jwt.filter.JwtIssueFilter;
+import com.wanted.preonboarding.jwt.handler.JwtAuthenticationFailureHandler;
+import com.wanted.preonboarding.jwt.handler.JwtIssueFailureHandler;
+import com.wanted.preonboarding.jwt.handler.WriterAuthorizationFailureHandler;
+import com.wanted.preonboarding.jwt.provider.JwtAuthenticationProvider;
 import com.wanted.preonboarding.jwt.provider.JwtProvider;
-import com.wanted.preonboarding.jwt.provider.JwtAuthorizationProvider;
+import com.wanted.preonboarding.jwt.provider.JwtIssueProvider;
 import com.wanted.preonboarding.jwt.provider.WriterAuthorizationProvider;
 import com.wanted.preonboarding.service.CustomUserDetailsService;
 import javax.validation.Validator;
@@ -36,60 +38,57 @@ public class SecurityConfig {
     private final JwtProvider jwtProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final JwtAuthorizationProvider jwtAuthorizationProvider;
-    private final CustomBearerTokenAuthenticationProvider customBearerTokenAuthenticationProvider;
+    private final JwtIssueFailureHandler jwtIssueFailureHandler;
+    private final JwtAuthenticationFailureHandler jwtAuthenticationFailureHandler;
+    private final WriterAuthorizationFailureHandler writerAuthorizationFailureHandler;
+
+    private final CustomAuthenticationSuccessHandler customAuthenticationSuccessHandler;
+
+    private final JwtIssueProvider jwtIssueProvider;
+    private final JwtAuthenticationProvider jwtAuthenticationProvider;
     private final WriterAuthorizationProvider writerAuthorizationProvider;
-    private final CustomUserDetailsService customUserDetailsService;
     private final Validator validator;
 
-    @Bean
-    public AHandler aHandler() {
-        return new AHandler();
-    }
 
     @Bean
-    public BHandler bHandler() {
-        return new BHandler();
-    }
-
-    @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter(AuthenticationManager authenticationManager) throws Exception {
-        final JwtAuthorizationFilter filter = new JwtAuthorizationFilter(validator, jwtProvider);
+    public JwtIssueFilter jwtIssueFilter(AuthenticationManager authenticationManager) throws Exception {
+        final JwtIssueFilter filter = new JwtIssueFilter(validator, jwtProvider);
         filter.setAuthenticationManager(authenticationManager);
-//        filter.setAuthenticationSuccessHandler(aHandler());
-//        filter.setAuthenticationFailureHandler(bHandler());
+        filter.setAuthenticationFailureHandler(jwtIssueFailureHandler);
 
         return filter;
     }
 
     @Bean
-    public CustomBearerTokenAuthenticationFilter customBearerTokenAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
-        final CustomBearerTokenAuthenticationFilter filter = new CustomBearerTokenAuthenticationFilter(jwtProvider);
+    public JwtAuthenticationFilter jwtAuthenticationFilter(AuthenticationManager authenticationManager) throws Exception {
+        final JwtAuthenticationFilter filter = new JwtAuthenticationFilter(jwtProvider);
         filter.setAuthenticationManager(authenticationManager);
-        filter.setAuthenticationSuccessHandler(aHandler());
-        filter.setAuthenticationFailureHandler(bHandler());
+        filter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
+        filter.setAuthenticationFailureHandler(jwtAuthenticationFailureHandler);
 
         return filter;
     }
 
     @Bean
     public WriterAuthorizationFilter writerAuthorizationFilter(AuthenticationManager authenticationManager) throws Exception {
-        final WriterAuthorizationFilter filter = new WriterAuthorizationFilter(validator, jwtProvider);
+        final WriterAuthorizationFilter filter = new WriterAuthorizationFilter(jwtProvider);
         filter.setAuthenticationManager(authenticationManager);
-        filter.setAuthenticationSuccessHandler(aHandler());
-        filter.setAuthenticationFailureHandler(bHandler());
+        filter.setAuthenticationSuccessHandler(customAuthenticationSuccessHandler);
+        filter.setAuthenticationFailureHandler(writerAuthorizationFailureHandler);
 
         return filter;
     }
 
+
     @Bean
     public AuthenticationManager authenticationManager(HttpSecurity http, PasswordEncoder passwordEncoder) throws Exception {
         return http.getSharedObject(AuthenticationManagerBuilder.class)
-                .userDetailsService(customUserDetailsService)
-                .passwordEncoder(passwordEncoder)
-                .and()
-                .authenticationProvider(jwtAuthorizationProvider)
-                .authenticationProvider(customBearerTokenAuthenticationProvider)
+                .parentAuthenticationManager(null)
+//                .userDetailsService(customUserDetailsService)
+//                .passwordEncoder(passwordEncoder)
+//                .and()
+                .authenticationProvider(jwtIssueProvider)
+                .authenticationProvider(jwtAuthenticationProvider)
                 .authenticationProvider(writerAuthorizationProvider)
                 .build();
     }
@@ -99,7 +98,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // token을 사용하는 방식이므로, csrf disable
-
                 .exceptionHandling(exceptionHandling -> exceptionHandling
                         .accessDeniedHandler(jwtAccessDeniedHandler)
                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -111,19 +109,14 @@ public class SecurityConfig {
                 .antMatchers(HttpMethod.GET, "/posts/**").permitAll()
                 .and()
 
-                // 이유는 못 찾았는데, requestMatchers 파라미터로 String 인식이 안됨. 그래서 antMatchers로 대체.
-//                .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests
-//                        .requestMatchers("/members", "/members/login").permitAll()
-//                        .anyRequest().authenticated()
-//                )
-
                 // 세션을 사용하지 않기 때문에 STATELESS로 설정
                 .sessionManagement(sessionManagement ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
 
-                .addFilterBefore(jwtAuthorizationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(customBearerTokenAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
+
+                .addFilterBefore(jwtIssueFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtAuthenticationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(writerAuthorizationFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class)
         ;
 
