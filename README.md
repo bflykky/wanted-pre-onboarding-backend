@@ -5,7 +5,7 @@
   <li><a href="#어플리케이션의-실행-방법">어플리케이션의 실행 방법</a></li>
   <li><a href="#AWS-환경-구조도">AWS 환경 구조도</a></li>
   <li><a href="#데이터베이스-테이블-구조">데이터베이스 테이블 구조</a></li>
-  <li><a href="#구현한-API의-동작을-촬영산-데모-영상-링크">구현한 API의 동작을 촬영산 데모 영상 링크</a></li>
+  <li><a href="#구현한-API의-동작을-촬영한-데모-영상-링크">구현한 API의 동작을 촬영한 데모 영상 링크</a></li>
   <li><a href="#구현-방법-및-이유에-대한-간략한-설명">구현 방법 및 이유에 대한 간략한 설명</a></li>
   <li><a href="#API-명세request-및-responses는-표-아래에-작성">API 명세(request 및 responses는 표 아래에 작성)</a></li>
 </ul>
@@ -14,19 +14,45 @@
 
 ## 지원자의 성명: 김강연
 
+
 ## 어플리케이션의 실행 방법
+### git clone 후 로컬 실행 방법
+
+[구글 드라이브에 저장된 application.yml 파일](https://drive.google.com/file/d/1MkCvnfkVN7k8mc8PY3trCW-KmD9uTsJU/view?usp=share_link)
+
+```shell
+cd {clone할 경로}
+git clone https://github.com/bflykky/wanted-pre-onboarding-backend.git
+cd wanted-pre-onboarding-backend
+# 위 링크의 application.yml 파일 저장.
+# mysql 접속 후 wanted_pre_assignment 데이터베이스 생성.
+# 새로운 사용자 생성 및 해당 사용자에게 wanted_pre_assignment 관련 모든 권한 부여
+# 저장한 application.yml 파일의 username 및 password를 새로 생성한 mysql의 유저 username과 password로 변경
+# application.yml을 wanted-pre-onboarding-backend/src/main/resources 경로에 저장
+./gradlew build
+cd build/libs
+java -jar pre-onboarding-0.0.1-SNAPSHOT.jar
+```
+이후, `POSTMAN` 등의 API 테스트 프로그램을 이용해 어플리케이션의 API를 호출할 수 있다.<br/>
+1. POSTMAN의 워크스페이스 초대 링크이다. 아래 링크를 들어가 `사전과제 테스트(로컬)` 컬렉션의 만들어진 Request 및 새로 Request를 생성하여 API를 호출할 수 있다.<br/>
+https://app.getpostman.com/join-team?invite_code=9a4d61ce8a3cc694c4d1ae4995448f31&target_code=dfce1f9a77c87c34404b6920165fe28a<br/>
+2. POSTMAN의 Collection 링크이다. 만들어진 Requet로 API를 호출할 수 있다.<br/>
+[POSTMAN 컬렉션 링크(로컬 서버)](https://www.postman.com/ssu-semicolon/workspace/wanted-pre-onboarding-pre-assignment/collection/28175596-b2fb3381-32c7-4c42-bb9c-73f9499fdc07?action=share&creator=28175596)
+
+### AWS에 배포된 서버 접속 방법
 
 AWS EC2 및 RDS를 이용해, 클라우드 환경 서버에 어플리케이션 환경을 구축하였다.
 배포한 AWS 서버의 주소는 다음과 같다(포트번호 포함).<br/>
 http://ec2-43-201-120-175.ap-northeast-2.compute.amazonaws.com:8080
-<br/>해당 도메인과 POSTMAN 프로그램을 이용해 어플리케이션의 API를 호출할 수 있다.<br/>
+<br/>해당 도메인 뒤에 API 별 경로를 붙여서, 아래와 같이 `POSTMAN` 등의 API 테스트 프로그램을 이용해 어플리케이션의 API를 호출할 수 있다.<br/>
 
-아래 링크는 POSTMAN의 워크스페이스 초대 링크이다. 아래 링크를 통해 만들어진 Request로 API를 호출할 수 있다.<br/>
+1. POSTMAN의 워크스페이스 초대 링크이다. 아래 링크를 통해 만들어진 Request 및 새로 Request를 생성하여 API를 호출할 수 있다.<br/>
 https://app.getpostman.com/join-team?invite_code=9a4d61ce8a3cc694c4d1ae4995448f31&target_code=dfce1f9a77c87c34404b6920165fe28a<br/>
+2. POSTMAN의 Collection 링크이다. 만들어진 Requet로 API를 호출할 수 있다.<br/>
+[POSTMAN 컬렉션 링크(AWS 서버)](https://www.postman.com/ssu-semicolon/workspace/wanted-pre-onboarding-pre-assignment/collection/28175596-6c49ec53-40f7-4aa6-9881-b9edf312f223?action=share&creator=28175596)
 
 > ### 주의점
-> 워크스페이스 내에 <strong>'사전 과제 테스트(AWS)'</strong>와 <strong>'사전 과제 테스트(로컬)'</strong> 2개가 있는데, **'사전 과제 테스트(AWS)'의 baseUrl 변수가 서버 주소로 설정되어 있으므로, '사전 과제 테스트(AWS)' 폴더 내의 request들을 이용하여 테스트할 수 있다**.
-> (로컬 서버 실행의 경우, application.yml 파일 생성과 MySQL 데이터베이스 생성 및 사용자 권한 부여 등 부가적인 설정이 필요하므로 로컬 서버 실행 방법은 생략하였다.)
+> 워크스페이스 내에 <strong>'사전 과제 테스트(AWS)'</strong>와 <strong>'사전 과제 테스트(로컬)'</strong> 2개가 있는데, 2개의 baseUrl이 각각 AWS서버 주소와, localhost:8080으로 다르게 설정되어 있기 때문에, 테스트할 때 확인해야 한다.
 
 POSTMAN 사용 예시이다.
 <img width="1770" alt="image" src="https://github.com/bflykky/wanted-pre-onboarding-backend/assets/67828333/0173583e-165e-4bc5-ad86-49811916bb3a">
@@ -47,8 +73,8 @@ POSTMAN 사용 예시이다.
 
 ---
 
-## 구현한 API의 동작을 촬영산 데모 영상 링크
-맥북 녹화와 POSTMAN으로 영상 찍기
+## 구현한 API의 동작을 촬영한 데모 영상 링크
+[구글 드라이브 API 동작 촬영 데모 영상 링크(MOV 파일)](https://drive.google.com/file/d/19DSba2G2Ncv5OCSgL6YUaGGeFOrhpkMb/view?usp=share_link)
 
 ---
 
@@ -72,9 +98,10 @@ POSTMAN 사용 예시이다.
 | PostController   | PostService   | PostRepository   | Post   |
 
 
-### 이메일과 비밀번호의 유효성 검증
+### 이메일과 비밀번호의 유효성 검증 및 비밀번호 암호화
 RequestDto 종류의 클래스들을 구현 시, <strong>javax.validation 라이브러리</strong>의 `@NotNull`, `@Email` 등의 어노테이션을 이용하여, 
-예외 발생 시 `@Valid` 어노테이션과 `GlobalExceptionHandler` 클래스에서 예외 처리를 하거나, 필터의 `handler`에서 예외 처리 후 에러 Response를 응답하도록 구현하였다. 
+예외 발생 시 `@Valid` 어노테이션과 `GlobalExceptionHandler` 클래스에서 예외 처리를 하거나, 필터의 `handler`에서 예외 처리 후 에러 Response를 응답하도록 구현하였다.
+비밀번호 암호화의 경우, 스프링 시큐리티의 BCryptEncoder 클래스를 이용해 클라이언트로부터 전달받은 비밀번호를 암호화하여 DB에 저장하도록 구현하였다.
 
 
 ### JWT 발급 및 JWT를 통한 작성자 여부 검증
@@ -204,7 +231,7 @@ Response
 ```json
 {
   "code": "String", // ex) "M006"
-  "message": "String", // ex) "모든 게시글을 성공적으로 조회하였습니다."
+  "message": "String", // ex) "게시글 목록을 성공적으로 조회하였습니다."
   "data": [  // array 형식
     {
       "postId": "number", // 게시글의 고유 id
