@@ -1,26 +1,14 @@
-- 교육생은 게시판을 관리하는 RESTful API를 개발하고 그 결과를 제출해야 합니다. (3. API 요구사항 참고)
-- 데이터 저장소로는 MySQL 8.0 버전의 관계형데이터베이스를 사용해주세요.
-- API의 정상 동작 여부, 작성된 코드의 품질, Git & Github의 사용 수준 등이 평가 기준이 됩니다.
-- 요구사항에 맞게 API를 만든 후에 아래의 기능을 추가할 경우 가산점이 주어집니다.
-  - 통합 테스트 또는 단위 테스트 코드를 추가한 경우
-  - docker compose를 이용하여 애플리케이션 환경을 구성한 경우 (README.md 파일에 docker-compose 실행 방법 반드시 기입)
-  - 클라우드 환경(AWS, GCP)에 배포 환경을 설계하고 애플리케이션을 배포한 경우 (README.md 파일에 배포된 API 주소와 설계한 AWS 환경 그림으로 첨부)
+<h1>원티드 프리온보딩 인턴십 백엔드 사전과제</h1>
 
-- 진행 중 발생하는 문의사항은 이 레포지토리의 Issue로 등록해주세요.
-
-
-## 과제 제출 필수 사항
-  - \[O\]과제의 소스코드는 반드시 본인의 GitHub 레포지토리에 Public으로 설정하여 업로드 해주세요.
-  - \[O\]레파지토리의 이름은 wanted-pre-onboarding-backend로 지정해야 합니다.
-  - \[ \]README.md 파일에는 다음과 같은 사항들이 포함되어야 합니다:
-    - \[O\]지원자의 성명
-    - \[O\]애플리케이션의 실행 방법 (엔드포인트 호출 방법 포함)
-    - \[O\]데이터베이스 테이블 구조
-    - \[ \]구현한 API의 동작을 촬영한 데모 영상 링크
-    - \[O\]구현 방법 및 이유에 대한 간략한 설명
-    - \[O\]API 명세(request/response 포함)
-    - \[ \]과제 제출은 참가 신청 시 수행한 과제의 레포지토리 주소를 제출하면 됩니다.
-   
+<ul>
+  <li><a href="#지원자의-성명-김강연">지원자의 성명: 김강연</a></li>
+  <li><a href="#어플리케이션의-실행-방법">어플리케이션의 실행 방법</a></li>
+  <li><a href="#AWS-환경-구조도">AWS 환경 구조도</a></li>
+  <li><a href="#데이터베이스-테이블-구조">데이터베이스 테이블 구조</a></li>
+  <li><a href="#구현한-API의-동작을-촬영산-데모-영상-링크">구현한 API의 동작을 촬영산 데모 영상 링크</a></li>
+  <li><a href="#구현-방법-및-이유에-대한-간략한-설명">구현 방법 및 이유에 대한 간략한 설명</a></li>
+  <li><a href="#API-명세request-및-responses는-표-아래에-작성">API 명세(request 및 responses는 표 아래에 작성)</a></li>
+</ul>
 
 ---
 
@@ -28,19 +16,25 @@
 
 ## 어플리케이션의 실행 방법
 
-!!! 사용한 MySQL 버전은 8.0.33입니다.
-
-클라우드 환경 AWS 서버를 열어, 해당 서버에 어플리케이션 환경을 구축하였다.
-배포한 서버의 주소는 다음과 같다(포트번호 포함).<br/>
+AWS EC2 및 RDS를 이용해, 클라우드 환경 서버에 어플리케이션 환경을 구축하였다.
+배포한 AWS 서버의 주소는 다음과 같다(포트번호 포함).<br/>
 http://ec2-43-201-120-175.ap-northeast-2.compute.amazonaws.com:8080
-<br/>해당 도메인과 POSTMAN 프로그램을 이용해 어플리케이션의 API를 호출할 수 있다.
-내가 테스트하면서 사용한 POSTMAN의 워크스페이스 초대 링크이다. 아래 링크를 통해 만들어진 Request로 API를 호출할 수 있다.
-https://app.getpostman.com/join-team?invite_code=9a4d61ce8a3cc694c4d1ae4995448f31&target_code=dfce1f9a77c87c34404b6920165fe28a
-워크스페이스 내에 '사전 과제 테스트(AWS)'와 '사전 과제 테스트(로컬)' 2개가 있는데, '사전 과제 테스트(AWS)'의 baseUrl 변수가 서버 주소로 설정되어 있으므로, '사전 과제 테스트(AWS)' 폴더 내의 request들을 이용하여 테스트할 수 있다.
-(로컬 서버에 실행할 경우, application.yml 파일 생성과 MySQL 데이터베이스 생성 및 사용자 권한 부여 등 부가적인 설정이 필요하므로 로컬 서버 실행 방법은 생략하였다.)
+<br/>해당 도메인과 POSTMAN 프로그램을 이용해 어플리케이션의 API를 호출할 수 있다.<br/>
+
+아래 링크는 POSTMAN의 워크스페이스 초대 링크이다. 아래 링크를 통해 만들어진 Request로 API를 호출할 수 있다.<br/>
+https://app.getpostman.com/join-team?invite_code=9a4d61ce8a3cc694c4d1ae4995448f31&target_code=dfce1f9a77c87c34404b6920165fe28a<br/>
+
+> ### 주의점
+> 워크스페이스 내에 <strong>'사전 과제 테스트(AWS)'</strong>와 <strong>'사전 과제 테스트(로컬)'</strong> 2개가 있는데, **'사전 과제 테스트(AWS)'의 baseUrl 변수가 서버 주소로 설정되어 있으므로, '사전 과제 테스트(AWS)' 폴더 내의 request들을 이용하여 테스트할 수 있다**.
+> (로컬 서버 실행의 경우, application.yml 파일 생성과 MySQL 데이터베이스 생성 및 사용자 권한 부여 등 부가적인 설정이 필요하므로 로컬 서버 실행 방법은 생략하였다.)
 
 POSTMAN 사용 예시이다.
+<img width="1770" alt="image" src="https://github.com/bflykky/wanted-pre-onboarding-backend/assets/67828333/0173583e-165e-4bc5-ad86-49811916bb3a">
 
+> ## !!!주의점
+> `이메일과 비밀번호의 유효성 검사는 위의 조건만으로 진행해 주세요. 추가적인 유효성 검사 조건은 포함하지 마세요.` 조건에 따라 이미 회원가입한 회원과 동일한 이메일을 이용해 회원가입하여도 정상 회원가입이 된다.
+> <strong>하지만, 이후 로그인 과정에서 오류가 발생하므로 동일한 이메일로 회원가입해서는 안된다.</strong>
+> 중복된 회원가입을 클라이언트가 직접 확인할 수 있게, `/members GET` 요청을 통해 회원가입된 회원들을 조회할 수 있다.(API 명세 참고)
 
 ## AWS 환경 구조도
 ![AWS 설계도](https://github.com/bflykky/wanted-pre-onboarding-backend/assets/67828333/14a905a5-265c-43e4-b015-43d727ab32bd)
@@ -48,6 +42,7 @@ POSTMAN 사용 예시이다.
 ---
 
 ## 데이터베이스 테이블 구조
+!!! 사용한 MySQL 버전은 8.0.33입니다.<br/>
 ![사전과제 테이블 다이어그램](https://github.com/bflykky/wanted-pre-onboarding-backend/assets/67828333/39bea3d3-6b0d-4a61-90e9-21d3f9cce5e7)
 
 ---
@@ -104,6 +99,7 @@ RequestDto 종류의 클래스들을 구현 시, <strong>javax.validation 라이
 |------|---|---|
 |/members|POST|사용자 회원가입|
 |/members/login|POST|사용자 로그인|
+|/members|GET|전체 사용자 조회|
 |/posts|POST|새로운 게시글 생성|
 |/posts?page=number|GET|게시글 목록 조회(10개 단위)|
 |/posts/:postId|GET|특정 게시글 조회|
@@ -128,7 +124,7 @@ Response
 	}
 }
 ```
-
+---
 ### /members/login POST 사용자 로그인
 Request
 
@@ -150,7 +146,34 @@ Response
 	}
 }
 ```
+---
+### /members GET 전체 사용자 조회
+해당 API는 위에서 명시한 주의점에 따라, 이미 등록된 회원들을 조회할 수 있어야 한다고 판단하여 구현하였다. 명시한 주의점은 다음과 같다.
+> ## !!!주의점
+> `이메일과 비밀번호의 유효성 검사는 위의 조건만으로 진행해 주세요. 추가적인 유효성 검사 조건은 포함하지 마세요.` 조건에 따라 이미 회원가입한 회원과 동일한 이메일을 이용해 회원가입하여도 정상 회원가입이 된다.
+> <strong>하지만, 이후 로그인 과정에서 오류가 발생하므로 동일한 이메일로 회원가입해서는 안된다.</strong>
 
+Respone
+```json
+{
+  "code": "String", // ex) "M003"
+  "message": "String", // ex) "모든 사용자들을 성공적으로 조회하였습니다."
+  "data": [ // array 형식
+    {
+      "memberId": "number", // 사용자의 고유 id
+      "email": "String", // 사용자의 email
+    },
+    ...
+    {
+      "memberId": "number", // 사용자의 고유 id
+      "email": "String", // 사용자의 email
+    }
+  ]
+}
+
+```
+
+---
 ### /posts POST 새로운 게시글 생성
 Request
 
@@ -172,7 +195,7 @@ Response
 	}
 }
 ```
-
+---
 ### /posts GET 게시글 목록 조회(10개 단위)
 쿼리 스트링의 page 값을 입력하지 않아도 된다. 이때, 최근 작성된 10개의 게시글이 response로 전달된다.
 page의 값은 0부터 시작한다.
@@ -180,9 +203,9 @@ page의 값은 0부터 시작한다.
 Response
 ```json
 {
-  "code": "String", // ex) "M005"
+  "code": "String", // ex) "M006"
   "message": "String", // ex) "모든 게시글을 성공적으로 조회하였습니다."
-  "data": [
+  "data": [  // array 형식
     {
       "postId": "number", // 게시글의 고유 id
       "writer": "String", // 게시글 작성자의 이메일
@@ -201,12 +224,12 @@ Response
   ]
 }
 ```
-
+---
 ### /posts/:postId GET 특정 게시글 조회
 Response
 ```json
 {
-  "code": "String", // ex) "M004"
+  "code": "String", // ex) "M005"
   "message": "String", // "입력한 postId의 게시글을 성공적으로 조회하였습니다."
   "data": {
     "postId": "number", // 게시글의 고유 id
@@ -217,7 +240,7 @@ Response
   }
 }
 ```
-
+---
 ### /posts/:postId PATCH 특정 게시글 수정
 Requset
 
@@ -232,19 +255,19 @@ Response
 
 ```json
 {
-    "code": "String", // ex) "M006"
+    "code": "String", // ex) "M007"
     "message": "String", // ex) "입력한 postId의 게시글을 성공적으로 수정하였습니다."
     "data": {
         "postId": "number" // 수정한 게시글의 고유 id
     }
 }
 ```
-
+---
 ### /posts/:postId DELETE 특정 게시글 삭제
 Response
 ```json
 {
-    "code": "String", // ex) "M007",
+    "code": "String", // ex) "M008",
     "message": "String", // ex) "입력한 postId의 게시글을 성공적으로 삭제하였습니다",
     "data": null
 }
