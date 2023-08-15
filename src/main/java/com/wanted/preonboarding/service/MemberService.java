@@ -27,17 +27,6 @@ public class MemberService {
         return MemberJoinResponseDto.of(memberId);
     }
 
-    public MemberLoginResponseDto login(String email, String password) {
-        Member member = memberRepository.findByEmail(email).orElseThrow(() -> new EntityNotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-        if (passwordEncoder.matches(password, member.getPassword())) {
-            // JWT 형식의 Access Token 발급
-            String token = null;
-            return MemberLoginResponseDto.of(token);
-        } else {
-            throw new PasswordNotMatchException(ErrorCode.PASSWORD_NOT_MATCH);
-        }
-    }
-
     public List<MemberInfoResponseDto> findAllMembers() {
         List<Member> members = memberRepository.findAll();
         List<MemberInfoResponseDto> memberInfoResponseDtoList = new ArrayList<>();
