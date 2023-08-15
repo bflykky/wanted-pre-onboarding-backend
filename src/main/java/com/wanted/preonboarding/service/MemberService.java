@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.service;
 
+import com.wanted.preonboarding.dto.member.MemberInfoResponseDto;
 import com.wanted.preonboarding.dto.member.MemberJoinResponseDto;
 import com.wanted.preonboarding.dto.member.MemberLoginResponseDto;
 import com.wanted.preonboarding.entity.Member;
@@ -10,6 +11,9 @@ import com.wanted.preonboarding.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,5 +36,15 @@ public class MemberService {
         } else {
             throw new PasswordNotMatchException(ErrorCode.PASSWORD_NOT_MATCH);
         }
+    }
+
+    public List<MemberInfoResponseDto> findAllMembers() {
+        List<Member> members = memberRepository.findAll();
+        List<MemberInfoResponseDto> memberInfoResponseDtoList = new ArrayList<>();
+        for (Member member : members) {
+            memberInfoResponseDtoList.add(MemberInfoResponseDto.of(member));
+        }
+
+        return memberInfoResponseDtoList;
     }
 }

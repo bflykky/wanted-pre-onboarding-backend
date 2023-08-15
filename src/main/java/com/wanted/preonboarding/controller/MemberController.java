@@ -1,5 +1,6 @@
 package com.wanted.preonboarding.controller;
 
+import com.wanted.preonboarding.dto.member.MemberInfoResponseDto;
 import com.wanted.preonboarding.dto.member.MemberJoinRequestDto;
 import com.wanted.preonboarding.dto.member.MemberLoginRequestDto;
 import com.wanted.preonboarding.dto.member.MemberJoinResponseDto;
@@ -9,11 +10,13 @@ import com.wanted.preonboarding.result.ResultResponse;
 import com.wanted.preonboarding.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,9 +33,14 @@ public class MemberController {
         return ResultResponse.of(ResultCode.MEMBER_JOIN_SUCCESS, memberJoinResponseDto);
     }
 
-
     @PostMapping(value = "/members/login")
     public ResultResponse login(@Valid @RequestBody MemberLoginRequestDto memberLoginRequestDto) {
         return ResultResponse.of(ResultCode.MEMBER_LOGIN_SUCCESS);
+    }
+
+    @GetMapping(value = "/members")
+    public ResultResponse findAllMembers() {
+        List<MemberInfoResponseDto> memberInfoResponseDtoList = memberService.findAllMembers();
+        return ResultResponse.of(ResultCode.ALL_MEMBERS_FIND_SUCCESS, memberInfoResponseDtoList);
     }
 }
