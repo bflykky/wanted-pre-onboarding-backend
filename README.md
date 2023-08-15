@@ -14,10 +14,10 @@
   - \[O\]레파지토리의 이름은 wanted-pre-onboarding-backend로 지정해야 합니다.
   - \[ \]README.md 파일에는 다음과 같은 사항들이 포함되어야 합니다:
     - \[O\]지원자의 성명
-    - \[ \]애플리케이션의 실행 방법 (엔드포인트 호출 방법 포함)
+    - \[O\]애플리케이션의 실행 방법 (엔드포인트 호출 방법 포함)
     - \[O\]데이터베이스 테이블 구조
     - \[ \]구현한 API의 동작을 촬영한 데모 영상 링크
-    - \[ \]구현 방법 및 이유에 대한 간략한 설명
+    - \[O\]구현 방법 및 이유에 대한 간략한 설명
     - \[O\]API 명세(request/response 포함)
     - \[ \]과제 제출은 참가 신청 시 수행한 과제의 레포지토리 주소를 제출하면 됩니다.
    
@@ -28,21 +28,34 @@
 
 ## 어플리케이션의 실행 방법
 
-### AWS에서 동작하는 서버로 접속
-클라우드 환경 AWS 서버를 열어, 해당 서버에 어플리케이션 환경을 구축하였습니다.
-배포한 서버의 주소는 다음과 같습니다(포트번호 포함).<br/>
+!!! 사용한 MySQL 버전은 8.0.33입니다.
+
+클라우드 환경 AWS 서버를 열어, 해당 서버에 어플리케이션 환경을 구축하였다.
+배포한 서버의 주소는 다음과 같다(포트번호 포함).<br/>
 http://ec2-43-201-120-175.ap-northeast-2.compute.amazonaws.com:8080
-<br/>해당 도메인과 POSTMAN 프로그램을 이용해 어플리케이션을 실행할 수 있습니다.
+<br/>해당 도메인과 POSTMAN 프로그램을 이용해 어플리케이션의 API를 호출할 수 있다.
+내가 테스트하면서 사용한 POSTMAN의 워크스페이스 초대 링크이다. 아래 링크를 통해 만들어진 Request로 API를 호출할 수 있다.
+https://app.getpostman.com/join-team?invite_code=9a4d61ce8a3cc694c4d1ae4995448f31&target_code=dfce1f9a77c87c34404b6920165fe28a
+워크스페이스 내에 '사전 과제 테스트(AWS)'와 '사전 과제 테스트(로컬)' 2개가 있는데, '사전 과제 테스트(AWS)'의 baseUrl 변수가 서버 주소로 설정되어 있으므로, '사전 과제 테스트(AWS)' 폴더 내의 request들을 이용하여 테스트할 수 있다.
+(로컬 서버에 실행할 경우, application.yml 파일 생성과 MySQL 데이터베이스 생성 및 사용자 권한 부여 등 부가적인 설정이 필요하므로 로컬 서버 실행 방법은 생략하였다.)
+
+POSTMAN 사용 예시이다.
+
 
 ## AWS 환경 구조도
 ![AWS 설계도](https://github.com/bflykky/wanted-pre-onboarding-backend/assets/67828333/14a905a5-265c-43e4-b015-43d727ab32bd)
 
+---
+
 ## 데이터베이스 테이블 구조
 ![사전과제 테이블 다이어그램](https://github.com/bflykky/wanted-pre-onboarding-backend/assets/67828333/39bea3d3-6b0d-4a61-90e9-21d3f9cce5e7)
 
+---
 
 ## 구현한 API의 동작을 촬영산 데모 영상 링크
 맥북 녹화와 POSTMAN으로 영상 찍기
+
+---
 
 ## 구현 방법 및 이유에 대한 간략한 설명
 
@@ -55,12 +68,18 @@ http://ec2-43-201-120-175.ap-northeast-2.compute.amazonaws.com:8080
 
 
 ### CRUD 방식
-`JPA`와 `pring Data JPA`를 이용하여 CRUD를 구현하였다. 스프링(스프링 부트)을 사용할 경우 JPA는 굳이 안쓸 필요가 없다 생각하였고, <u>적은 코드로 CRUD를 구현할 수 있기 때문에 이용</u>하였다.
+`Spring MVC`, `JPA` 및 `pring Data JPA`를 이용하여 CRUD를 구현하였다. 스프링(스프링 부트)을 사용할 경우 JPA는 굳이 안쓸 필요가 없다 생각하였다.
+'Controller', 'Service', 'Repository', 'Entity' 단을 분리하여 구현하였고, 회원은 Member로, 게시글은 Post로 도메인을 설정하여 구현하였다.
+
+| Controller       | Service       | Repository       | Entity |
+|------------------|---------------|------------------|--------|
+| MemberController | MemberService | MemberRepository | Member |
+| PostController   | PostService   | PostRepository   | Post   |
 
 
 ### 이메일과 비밀번호의 유효성 검증
 RequestDto 종류의 클래스들을 구현 시, <strong>javax.validation 라이브러리</strong>의 `@NotNull`, `@Email` 등의 어노테이션을 이용하여, 
-예외 발생 시 `ExceptionHandler` 또는 필터의 `handler`에서 예외 처리 후 에러 Response를 응답하도록 구현하였다. 
+예외 발생 시 `@Valid` 어노테이션과 `GlobalExceptionHandler` 클래스에서 예외 처리를 하거나, 필터의 `handler`에서 예외 처리 후 에러 Response를 응답하도록 구현하였다. 
 
 
 ### JWT 발급 및 JWT를 통한 작성자 여부 검증
@@ -78,6 +97,7 @@ RequestDto 종류의 클래스들을 구현 시, <strong>javax.validation 라이
 
 그렇지만, 해당 기술을 공부하고 처음으로 적용해보았다는 점에서 스스로 의미가 있다고 생각하였다.
 
+---
 
 ## API 명세(request 및 responses는 표 아래에 작성)
 |URI|HTTP METHOD|기능|
